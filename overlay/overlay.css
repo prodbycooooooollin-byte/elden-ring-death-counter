@@ -1,0 +1,256 @@
+/* OBS overlay on a fixed 1920 x 1080 stage that JS scales to the source size.
+   Modelled on the game's own HUD: the rune counter (icon + number on a flat band that
+   fades out), thin pale rules, one serif, no ornaments. */
+
+@import url("https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Cormorant+SC:wght@500;600&display=swap");
+
+html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+
+#stage {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: 0 0;
+  transform: scale(var(--fit, 1));
+  font-family: var(--serif);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Preview backdrops for the control panel (never used in OBS). */
+body.bg-dark #stage { background: linear-gradient(170deg, #2b2a26 0%, #14130f 60%, #0a0a08 100%); }
+body.bg-light #stage {
+  background:
+    radial-gradient(70% 60% at 65% 25%, #f3ecd2 0%, transparent 70%),
+    linear-gradient(180deg, #c9c3a6 0%, #9da27c 45%, #5d6a43 75%, #39432a 100%);
+}
+
+/* Text that sits on bright gameplay keeps a tight dark edge, like the game's own HUD text. */
+.hud-text-edge { text-shadow: 0 0 1px #000, 0 1px 2px rgba(0, 0, 0, 0.9), 0 0 8px rgba(0, 0, 0, 0.55); }
+
+/* ================================================================ Counter */
+
+.counter { position: absolute; --s: 1; --back: 0.62; transform: scale(var(--s)); }
+.counter.pos-tl { left: 48px; top: 40px; transform-origin: 0 0; }
+.counter.pos-tr { right: 48px; top: 40px; transform-origin: 100% 0; }
+.counter.pos-bl { left: 48px; bottom: 44px; transform-origin: 0 100%; }
+.counter.pos-br { right: 48px; bottom: 44px; transform-origin: 100% 100%; }
+
+/* ---------- HUD band (default) */
+
+.hud {
+  position: relative;
+  display: grid;
+  grid-template-columns: 64px auto;
+  grid-template-areas: "icon main" "sub sub";
+  column-gap: 18px;
+  align-items: center;
+  padding: 14px 110px 14px 18px;
+}
+.right .hud { direction: rtl; padding: 14px 18px 14px 110px; }
+.right .hud > * { direction: ltr; }
+
+.hud::before {
+  /* the flat band; fades out on the open side, as the rune counter's band does */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, var(--back)) 0%, rgba(0, 0, 0, var(--back)) 58%, transparent 100%);
+}
+.right .hud::before { background: linear-gradient(270deg, rgba(0, 0, 0, var(--back)) 0%, rgba(0, 0, 0, var(--back)) 58%, transparent 100%); }
+.hud::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  border-image: linear-gradient(90deg, rgba(214, 200, 160, 0.42), rgba(214, 200, 160, 0.18) 60%, transparent) 1;
+  pointer-events: none;
+}
+.right .hud::after { border-image: linear-gradient(270deg, rgba(214, 200, 160, 0.42), rgba(214, 200, 160, 0.18) 60%, transparent) 1; }
+
+.hud-icon { grid-area: icon; position: relative; width: 64px; height: 64px; display: block; object-fit: contain; }
+.hud-main { grid-area: main; position: relative; display: grid; justify-items: start; }
+.right .hud-main { justify-items: end; }
+
+.hud-label { font-size: 21px; line-height: 1; color: #cfc6b2; letter-spacing: 0.02em; }
+.hud-num {
+  font-size: 76px;
+  font-weight: 500;
+  line-height: 0.9;
+  margin-top: 4px;
+  color: var(--text);
+}
+
+.hud-sub {
+  grid-area: sub;
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 26px;
+  margin-top: 10px;
+  padding-top: 9px;
+  font-size: 21px;
+  color: #bdb4a0;
+}
+.hud-sub::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 20%;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(214, 200, 160, 0.3), transparent);
+}
+.right .hud-sub { justify-content: flex-end; }
+.right .hud-sub::before { left: 20%; right: 0; background: linear-gradient(270deg, rgba(214, 200, 160, 0.3), transparent); }
+.hud-sub b { font-weight: 500; color: var(--text); margin-left: 7px; }
+.hud-sub .boss { max-width: 470px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); }
+.hud-sub .boss b { color: #e07a62; }
+
+/* ---------- Emblem (default): the streamer's reference composition */
+
+:root {
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Bone-and-brass metal with a worn grain, as in the reference lettering */
+.metal {
+  background-image: var(--grain), linear-gradient(180deg, #e8dcc0 0%, #d8c7a3 45%, #c6b38a 75%, #d6c6a2 100%);
+  background-size: 160px 160px, 100% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #e4d8b8;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 10px rgba(0, 0, 0, 0.45));
+}
+
+.emblem {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  padding: 16px 24px 16px 16px;
+  --h: 150px;                 /* emblem height; everything below is proportional to the reference */
+}
+.emblem::before {
+  /* optional soft shade for bright gameplay, set by the backdrop slider */
+  content: "";
+  position: absolute;
+  inset: -20px -40px;
+  background: radial-gradient(closest-side, rgba(0, 0, 0, var(--back)), rgba(0, 0, 0, calc(var(--back) * 0.6)) 55%, transparent);
+  pointer-events: none;
+}
+.emblem-art {
+  position: relative;
+  height: var(--h);
+  width: auto;
+  flex: none;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.8));
+}
+.emblem-body { position: relative; display: grid; align-content: start; margin-left: calc(var(--h) * 0.066); }
+.emblem-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--h) * 0.28);
+  padding: 0 calc(var(--h) * 0.04) 0 calc(var(--h) * 0.167);
+  margin-top: calc(var(--h) * -0.14);
+}
+.emblem-label {
+  font-family: "Cormorant SC", "Cormorant Garamond", var(--serif);
+  font-weight: 600;
+  font-size: calc(var(--h) * 0.4);
+  line-height: 1;
+  letter-spacing: 0.28em;
+  margin-right: -0.28em;
+  text-transform: uppercase;
+}
+.emblem-num {
+  font-family: "Cormorant Garamond", var(--serif);
+  font-weight: 500;
+  font-size: calc(var(--h) * 0.92);
+  line-height: 0.82;
+  min-width: 2ch;
+  text-align: right;
+}
+.emblem-rule {
+  height: calc(var(--h) * 0.018);
+  min-height: 2px;
+  margin-top: calc(var(--h) * 0.26);
+  background-image: var(--grain), linear-gradient(90deg, #6a4e22 0%, #8a6a32 10%, #a07c3e 50%, #8a6a32 90%, #6a4e22 100%);
+  background-size: 160px 160px, 100% 100%;
+  clip-path: polygon(0 50%, 1.5% 0, 98.5% 0, 100% 50%, 98.5% 100%, 1.5% 100%);
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7));
+}
+.emblem-sub {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  padding: 10px 6px 0 14px;
+  font-size: 22px;
+  color: #d8cdb2;
+  text-shadow: 0 1px 2px #000, 0 0 8px rgba(0, 0, 0, 0.7);
+}
+.emblem-sub b { font-weight: 500; color: #efe6d0; margin-left: 7px; }
+.emblem-sub .boss b { color: #e07a62; }
+.emblem .flare { animation: flare-metal 1.4s ease-out; }
+@keyframes flare-metal {
+  0% { filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 16px rgba(200, 40, 20, 0.95)); }
+  100% { filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.9)) drop-shadow(0 0 10px rgba(0, 0, 0, 0.45)); }
+}
+
+/* ---------- Compact: icon and number only */
+
+.compact { position: relative; display: flex; align-items: center; gap: 12px; padding: 8px 64px 8px 10px; }
+.right .compact { flex-direction: row-reverse; padding: 8px 10px 8px 64px; }
+.compact::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(0, 0, 0, var(--back)) 50%, transparent); }
+.right .compact::before { background: linear-gradient(270deg, rgba(0, 0, 0, var(--back)) 50%, transparent); }
+.compact .hud-icon { width: 48px; height: 48px; }
+.compact .hud-num { position: relative; font-size: 58px; margin: 0; }
+
+/* ---------- Boss bar: like the game's encounter health bar */
+
+.counter.layout-bossbar { left: 50%; right: auto; top: auto; bottom: 96px; transform-origin: 50% 100%; transform: translateX(-50%) scale(var(--s)); }
+.counter.layout-bossbar.pos-tl, .counter.layout-bossbar.pos-tr { top: 64px; bottom: auto; transform-origin: 50% 0; }
+.bossbar { width: 1060px; }
+.bossbar-head { display: flex; align-items: baseline; justify-content: space-between; gap: 24px; padding: 0 2px 6px; }
+.bossbar-name { font-size: 27px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bossbar-figures { display: flex; align-items: baseline; gap: 28px; font-size: 21px; color: #cfc6b2; white-space: nowrap; }
+.bossbar-figures b { font-size: 30px; font-weight: 500; color: var(--text); margin-left: 8px; }
+.bossbar-figures .boss b { color: #e07a62; }
+.bossbar-track {
+  position: relative;
+  height: 12px;
+  background: rgba(0, 0, 0, calc(0.35 + var(--back) * 0.5));
+  border: 1px solid rgba(190, 172, 128, 0.75);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.85);
+}
+.bossbar-fill {
+  position: absolute;
+  inset: 1px auto 1px 1px;
+  width: calc(var(--fill, 0) * (100% - 2px));
+  background: linear-gradient(180deg, #a3271a, #6d140c);
+  transition: width 1.2s var(--ease-out);
+}
+.bossbar-icon { width: 34px; height: 34px; vertical-align: -7px; margin-right: 10px; }
+
+/* ---------- Number change: the count changes in place, only a brief red flare */
+
+.flare { animation: flare 1.4s ease-out; }
+@keyframes flare {
+  0% { color: #ff8c70; text-shadow: 0 0 1px #000, 0 0 18px rgba(200, 40, 20, 0.85); }
+  100% { color: var(--text); }
+}
+
+.offline {
+  position: absolute;
+  left: 48px;
+  top: 40px;
+  margin: 0;
+  padding: 10px 18px;
+  font-size: 20px;
+  color: var(--text-dim);
+  background: rgba(0, 0, 0, 0.7);
+}

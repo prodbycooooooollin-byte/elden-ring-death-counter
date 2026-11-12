@@ -1,0 +1,31 @@
+appId: de.prodbycooooooollin.deathcounter
+productName: Death Counter
+directories:
+  output: dist
+  buildResources: resources
+files:
+  - out/**
+  - package.json
+extraResources:
+  - from: overlay
+    to: overlay
+  - from: resources/emblem.png
+    to: emblem.png
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: resources/icon.ico
+  artifactName: DeathCounter-Setup-${version}.${ext}
+nsis:
+  oneClick: true
+  perMachine: false
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  shortcutName: Death Counter
+  runAfterFinish: true
+publish:
+  provider: github
+  owner: prodbycooooooollin-byte
+  repo: elden-ring-death-counter
+  releaseType: release

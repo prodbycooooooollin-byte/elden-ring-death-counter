@@ -1,62 +1,55 @@
-# Elden Ring Death Counter für OBS
+# Death Counter für Elden Ring
 
-Zählt deine Tode in Elden Ring automatisch und zeigt sie im Stream. Dazu gibt es ein Steuerpult für dich als Streamer.
-Läuft unter Windows mit Python 3.9 oder neuer. Zusätzliche Python-Pakete sind nicht nötig.
+Windows-App, die deine Tode in Elden Ring automatisch zählt und als Overlay in OBS zeigt.
 
-## So zählt der Counter
+## Installieren
 
-Elden Ring speichert für jeden Charakter selbst, wie oft er gestorben ist. Der Counter liest diese Zahl einmal pro
-Sekunde aus deinem Spielstand `ER0000.sl2` und verändert die Datei dabei nie.
+1. Unter [Releases](https://github.com/prodbycooooooollin-byte/elden-ring-death-counter/releases/latest)
+   `DeathCounter-Setup-<Version>.exe` herunterladen und starten.
+   Windows SmartScreen kann warnen, weil die App nicht signiert ist: „Weitere Informationen“ > „Trotzdem ausführen“.
+2. Die App startet von selbst und liegt danach im Startmenü und auf dem Desktop.
 
-- **Gesamt** ist die Zahl aus dem Spielstand. Sie enthält auch alle Tode, die vor dem ersten Start des Counters passiert sind.
+Updates lädt die App selbst von GitHub.
+
+## So zählt die App
+
+Elden Ring speichert für jeden Charakter, wie oft er gestorben ist. Die App findet deinen Spielstand
+(`%APPDATA%\EldenRing\<Steam-ID>\ER0000.sl2`, auch Seamless Coop `ER0000.co2`) beim Start von selbst und reagiert sofort,
+wenn das Spiel ihn speichert. Sie liest die Datei nur und verändert sie nie.
+
+- **Tode insgesamt** kommen aus dem Spielstand und enthalten auch alle Tode von vor der Installation.
 - **Diese Session** beginnt beim Start bei null.
-- Neue Tode erscheinen, sobald das Spiel speichert, meist wenige Sekunden nach dem Tod.
+- Bei mehreren Charakteren folgt die App dem, den du gerade spielst. Unter „Charakter“ lässt er sich auch fest wählen.
+- Ohne Spielstand zählst du mit der Leertaste von Hand.
 
-Den Spielstand findet der Counter von selbst unter `%APPDATA%\EldenRing`. Bei mehreren Steam-Profilen nimmt er den
-zuletzt gespeicherten. Bei mehreren Charakteren erkennt er den, den du gerade spielst, denn nur dessen Spielzeit läuft
-weiter. Seamless Coop (`ER0000.co2`) wird mit erkannt. Ohne Spielstand zählst du mit der Leertaste von Hand.
+## In OBS einbinden
 
-## Start
-
-1. Neueste Version unter [Releases](https://github.com/prodbycooooooollin-byte/elden-ring-death-counter/releases/latest)
-   als Zip herunterladen und **entpacken** (Rechtsklick > „Alle extrahieren“). Aus dem Zip heraus startet die App nicht.
-2. Im entpackten Ordner `DeathCounter.exe` doppelklicken. Es öffnet sich das Fenster des Counters. Python oder andere
-   Programme müssen nicht installiert sein.
-   Beim ersten Start kann Windows SmartScreen warnen, weil die Datei neu und unsigniert ist:
-   „Weitere Informationen“ > „Trotzdem ausführen“.
-3. Beim ersten Start in den Einstellungen auf **Spiel-Icons laden** klicken (siehe [Quellen](assets/QUELLEN.md)).
-4. In OBS eine **Browser**-Quelle mit `http://127.0.0.1:8737/overlay/` anlegen, Breite 1920, Höhe 1080.
-   Die Seite **OBS-Overlay** im Pult zeigt alle Adressen und eine Vorschau.
-
-Schließt du das Fenster, läuft der Counter im Hintergrund weiter, solange OBS das Overlay anzeigt, und beendet sich
-danach von selbst. Ein erneuter Doppelklick holt das Fenster zurück. Sofort beenden: Einstellungen > Programm.
-
-## Updates
-
-Beim Start prüft der Counter, ob es auf GitHub ein neueres Release gibt, und spielt es ein. Danach startet er neu.
-Zähler, Bosse, Einstellungen und eigene Dateien in `assets` bleiben dabei erhalten. In den Einstellungen lässt sich
-das automatische Installieren abschalten und von Hand prüfen.
+Seite **OBS-Overlay** öffnen, **Adresse kopieren**, in OBS eine **Browser**-Quelle anlegen, URL einfügen, 1920 × 1080.
+Der Hintergrund ist durchsichtig. Die App muss während des Streams laufen. Schließt du das Fenster, läuft sie im
+Infobereich weiter. Beenden über das Symbol dort.
 
 ## Weitere Funktionen
 
-- Bosse: Wähle den aktuellen Gegner. Jeder Tod wird ihm angerechnet. „Feind gefällt“ blendet die Siegesmeldung ein.
-- Einblendungen im Overlay: YOU DIED bei jedem Tod, FEIND GEFÄLLT, Name des neuen Gegners.
-- Stream Deck: Adressen wie `http://127.0.0.1:8737/api/quick/add` lösen Aktionen aus (Liste im Pult unter Einstellungen).
-- Für „Text (GDI+)“-Quellen schreibt der Counter weiterhin `obs-data/deaths_total.txt`, `deaths_session.txt` und `boss_current.txt`.
-- Eigene Schrift, eigenes Icon, eigene Klänge: siehe `assets/LIESMICH.txt`.
+- Bosse: aktiven Gegner wählen, Versuche zählen, als gefällt markieren.
+- Overlay-Stile: Emblem, Leiste, Kompakt, Bossbalken. Position, Größe, Schatten und Zusatzwerte einstellbar.
+- Stream Deck: Adressen unter Einstellungen (`http://127.0.0.1:8737/api/quick/add` usw.).
+- Textdateien für „Text (GDI+)“-Quellen: OBS-Overlay > Textquellen > Ordner öffnen.
 
-## Für Entwickler
+## Entwicklung
 
 ```powershell
-py -3 -m app --no-browser          # Server starten (oder: start_counter.cmd)
-py -3 -m unittest discover tests   # Tests mit künstlichen Spielständen
-pyinstaller --windowed --onedir --name DeathCounter --icon launcher/emblem.ico launcher/launcher.py
-py -3 tools/build_release.py --exe-dir dist/DeathCounter   # Release-Zip in dist/ bauen
+npm install
+npm run dev        # App mit Hot Reload
+npm test           # Tests mit künstlichen Spielständen
+npm run dist       # Installer in dist/
+npm run release    # Installer bauen und als GitHub-Release veröffentlichen (GH_TOKEN nötig)
 ```
 
-`death_counter.py` funktioniert weiterhin allein als Kommandozeilenwerkzeug (`py -3 death_counter.py --list`).
+Aufbau: `src/main` (Electron-Hauptprozess: Spielstand-Leser, Tracker, Overlay-Server, Updates), `src/preload`,
+`src/renderer` (React, Tailwind, Radix UI, Motion, Lucide), `overlay/` (Browserquelle für OBS).
 
-Das Dateilayout orientiert sich am [Save-Parser von EldenRingDeathCounterOBS](https://github.com/froagkey/EldenRingDeathCounterOBS/blob/e4c77fe/death_counter/save_parser.py)
-und an der [SaveForge-Dokumentation](https://github.com/oisis/EldenRing-SaveForge/blob/main/spec/26-parameter-reference.md#death-count).
+Das Dateilayout des Spielstands folgt dem [Save-Parser von EldenRingDeathCounterOBS](https://github.com/froagkey/EldenRingDeathCounterOBS/blob/e4c77fe/death_counter/save_parser.py)
+und der [SaveForge-Dokumentation](https://github.com/oisis/EldenRing-SaveForge/blob/main/spec/26-parameter-reference.md#death-count).
 
-Elden Ring ist eine Marke von FromSoftware Inc. und Bandai Namco Entertainment. Dieses Projekt ist ein inoffizielles Fanprojekt.
+Elden Ring ist eine Marke von FromSoftware Inc. und Bandai Namco Entertainment. Dies ist ein inoffizielles Fanprojekt.
+Das Emblem stammt aus der eigenen Referenzgestaltung des Projekts.

@@ -5,6 +5,7 @@ import json
 import mimetypes
 from pathlib import Path
 import queue
+import sys
 from urllib.parse import urlsplit
 
 WEB_ROOT = Path(__file__).resolve().parent.parent / "web"
@@ -206,3 +207,10 @@ def make_handler(tracker):
 class Server(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = False
+
+    def handle_error(self, request, client_address):
+        # A closed browser tab or OBS source drops its connection: not worth a traceback.
+        error = sys.exc_info()[1]
+        if isinstance(error, (ConnectionError, TimeoutError)):
+            return
+        super().handle_error(request, client_address)

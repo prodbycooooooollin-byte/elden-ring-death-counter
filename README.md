@@ -19,13 +19,17 @@ weiter. Seamless Coop (`ER0000.co2`) wird mit erkannt. Ohne Spielstand zählst d
 ## Start
 
 1. Neueste Version unter [Releases](https://github.com/prodbycooooooollin-byte/elden-ring-death-counter/releases/latest)
-   als Zip herunterladen und entpacken.
-2. `start_counter.cmd` doppelklicken. Das Steuerpult öffnet sich im Browser unter `http://127.0.0.1:8737/control/`.
+   als Zip herunterladen und **entpacken** (Rechtsklick > „Alle extrahieren“). Aus dem Zip heraus startet die App nicht.
+2. Im entpackten Ordner `DeathCounter.exe` doppelklicken. Es öffnet sich das Fenster des Counters. Python oder andere
+   Programme müssen nicht installiert sein.
+   Beim ersten Start kann Windows SmartScreen warnen, weil die Datei neu und unsigniert ist:
+   „Weitere Informationen“ > „Trotzdem ausführen“.
 3. Beim ersten Start in den Einstellungen auf **Spiel-Icons laden** klicken (siehe [Quellen](assets/QUELLEN.md)).
 4. In OBS eine **Browser**-Quelle mit `http://127.0.0.1:8737/overlay/` anlegen, Breite 1920, Höhe 1080.
    Die Seite **OBS-Overlay** im Pult zeigt alle Adressen und eine Vorschau.
 
-Das Fenster des Counters muss während des Streams offen bleiben.
+Schließt du das Fenster, läuft der Counter im Hintergrund weiter, solange OBS das Overlay anzeigt, und beendet sich
+danach von selbst. Ein erneuter Doppelklick holt das Fenster zurück. Sofort beenden: Einstellungen > Programm.
 
 ## Updates
 
@@ -44,9 +48,10 @@ das automatische Installieren abschalten und von Hand prüfen.
 ## Für Entwickler
 
 ```powershell
-py -3 -m app --no-browser          # Server starten
+py -3 -m app --no-browser          # Server starten (oder: start_counter.cmd)
 py -3 -m unittest discover tests   # Tests mit künstlichen Spielständen
-py -3 tools/build_release.py       # Release-Zip in dist/ bauen
+pyinstaller --windowed --onedir --name DeathCounter --icon launcher/emblem.ico launcher/launcher.py
+py -3 tools/build_release.py --exe-dir dist/DeathCounter   # Release-Zip in dist/ bauen
 ```
 
 `death_counter.py` funktioniert weiterhin allein als Kommandozeilenwerkzeug (`py -3 death_counter.py --list`).

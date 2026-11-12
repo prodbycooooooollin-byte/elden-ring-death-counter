@@ -117,6 +117,10 @@ class Hub:
             self._clients.add(q)
         return q
 
+    def client_count(self):
+        with self._lock:
+            return len(self._clients)
+
     def unsubscribe(self, q):
         with self._lock:
             self._clients.discard(q)
@@ -141,6 +145,7 @@ class Tracker:
         self.state_file = self.data_dir / "state.json"
         self.hub = Hub()
         self.updater = None
+        self.on_quit = None
         self.lock = threading.RLock()
         self._dirty = threading.Event()
         self._stop = threading.Event()
@@ -536,6 +541,11 @@ class Tracker:
             self.slot = slot
             self.offset = 0
             self._rebase()
+
+    def _do_quit(self, a):
+        if not self.on_quit:
+            raise ValueError("Beenden ist hier nicht möglich.")
+        threading.Timer(0.3, self.on_quit).start()
 
     def _do_update_check(self, a):
         if not self.updater:

@@ -48,10 +48,19 @@ function mount(root) {
       quickRow("Einen abziehen", "undo"),
       quickRow("Gegner gefällt", "felled"),
       quickRow("Neue Session", "session")),
+    block("Programm", null,
+      h("p.hint", "Schließt du dieses Fenster, läuft der Counter weiter, solange OBS das Overlay zeigt, und beendet sich danach von selbst. Hier beendest du ihn sofort."),
+      h("div.row", h("button.btn", { type: "button", onclick: quit }, "Death Counter beenden"))),
     block("Zurücksetzen", null,
       h("div.row", { style: { marginTop: "12px" } }, h("button.btn.btn-danger", { type: "button", onclick: resetSettings }, "Alle Einstellungen zurücksetzen")),
       h("p.hint", "Zähler, Bosse und Spielstand bleiben unverändert.")),
   );
+}
+
+async function quit() {
+  if (await confirmDialog("Death Counter beenden? Das Overlay in OBS zeigt dann keine Tode mehr an.", "Beenden")) {
+    await run(action("quit"), "Death Counter wird beendet");
+  }
 }
 
 async function resetSettings() {

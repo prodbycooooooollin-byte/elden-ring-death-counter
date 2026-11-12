@@ -22,7 +22,8 @@ import zipfile
 REPO = "prodbycooooooollin-byte/elden-ring-death-counter"
 ROOT = Path(__file__).resolve().parent.parent
 VERSION_FILE = ROOT / "VERSION"
-PROTECTED = {"data", "obs-data", "assets", ".git", ".claude", "dist"}
+# User data, and the running launcher itself (Windows locks a running .exe and its runtime).
+PROTECTED = {"data", "obs-data", "assets", ".git", ".claude", "dist", "DeathCounter.exe", "_internal"}
 USER_AGENT = "elden-ring-death-counter-updater"
 CHECK_EVERY = 6 * 3600
 
@@ -134,10 +135,15 @@ class Updater:
     def restart(self):
         """Start a fresh process with the same arguments and end this one."""
         self.tracker.stop()
-        args = [sys.executable, "-m", "app", *sys.argv[1:]]
-        if "--no-browser" not in args:
-            args.append("--no-browser")
-        flags = getattr(subprocess, "CREATE_NEW_CONSOLE", 0) if os.name == "nt" else 0
+        if getattr(sys, "frozen", False):
+            # DeathCounter.exe: start it again; the open app window reconnects by itself.
+            args = [sys.executable, "--window", "--no-open"]
+            flags = 0
+        else:
+            args = [sys.executable, "-m", "app", *sys.argv[1:]]
+            if "--no-browser" not in args:
+                args.append("--no-browser")
+            flags = getattr(subprocess, "CREATE_NEW_CONSOLE", 0) if os.name == "nt" else 0
         subprocess.Popen(args, cwd=str(ROOT), creationflags=flags)
         time.sleep(0.5)
         os._exit(0)

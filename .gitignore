@@ -1,0 +1,15 @@
+# user data and runtime output
+data/
+obs-data/
+dist/
+__pycache__/
+*.pyc
+.claude/
+
+# Elden Ring artwork belongs to FromSoftware / Bandai Namco: never commit it
+assets/*
+!assets/LIESMICH.txt
+!assets/QUELLEN.md
+
+# reference images and screenshots kept locally
+/*.png

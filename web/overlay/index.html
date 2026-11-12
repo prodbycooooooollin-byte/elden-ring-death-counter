@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Death Counter Overlay</title>
+  <link rel="stylesheet" href="/shared/tokens.css">
+  <link rel="stylesheet" href="overlay.css">
+</head>
+<body>
+  <main id="stage" aria-live="polite">
+    <div id="vignette" class="vignette"></div>
+    <section id="counter" class="counter" hidden></section>
+    <section id="announce" class="announce hud-text-edge" aria-hidden="true">
+      <p class="announce-region"></p>
+      <h2 class="announce-name"></h2>
+      <div class="announce-rule"></div>
+    </section>
+    <section id="banner" class="banner" aria-hidden="true">
+      <div class="banner-band"></div>
+      <div class="banner-ghost"></div>
+      <h1 class="banner-title"></h1>
+      <p class="banner-sub"></p>
+    </section>
+    <p id="offline" class="offline" hidden>Death Counter nicht erreichbar</p>
+  </main>
+  <script type="module" src="overlay.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+/* Shared design tokens for the control panel and the OBS overlay.
+   Derived from the game's HUD: flat translucent black, thin pale rules, one restrained serif. */
+@import url("https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap");
+
+:root {
+  --black: #000;
+  --ink: #0d0c0a;          /* app background */
+  --ink-2: #16140f;        /* raised rows */
+  --ink-3: #221f18;        /* hover / selected rows */
+  --veil: rgba(0, 0, 0, 0.62);   /* HUD band */
+
+  --text: #e6e0d0;          /* HUD white, slightly warm */
+  --text-dim: #a39c8a;
+  --text-faint: #6b6557;
+
+  --brass: #bfa66e;         /* menu headings and selected markers, used flat */
+  --brass-dim: #6e6142;
+  --rule: rgba(214, 200, 160, 0.22);
+  --rule-strong: rgba(214, 200, 160, 0.45);
+
+  --red: #a8251b;           /* YOU DIED */
+  --red-text: #d0533f;      /* readable red for small numbers */
+  --live: #8fae6a;
+
+  --serif: "EB Garamond", "Garamond", "Georgia", serif;
+  --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.num { font-variant-numeric: lining-nums tabular-nums; font-feature-settings: "lnum" 1, "tnum" 1; }

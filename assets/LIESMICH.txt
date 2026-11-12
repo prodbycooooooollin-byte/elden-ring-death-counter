@@ -1,0 +1,18 @@
+Eigene Grafiken, Schriften und Klänge fürs Overlay
+==================================================
+
+Lege Dateien mit genau diesen Namen in diesen Ordner. Das Overlay nutzt sie
+nach einem Neuladen der Browserquelle in OBS (Rechtsklick > Aktualisieren).
+Fehlt eine Datei, bleibt die eingebaute Gestaltung.
+
+  font-display.woff2 / .ttf / .otf   Schrift für Zahlen, YOU DIED, Bossnamen
+  font-text.woff2 / .ttf / .otf      Schrift für kleine Beschriftungen
+  icon.png / .webp                   ersetzt das Todesfäule-Icon neben dem Zähler
+  plate.png / .webp / .jpg           Hintergrundbild hinter dem Zähler
+  banner.png / .webp / .jpg          Hintergrundband hinter YOU DIED und FEIND GEFÄLLT
+  death.mp3 / .ogg / .wav            Klang beim Tod
+  felled.mp3 / .ogg / .wav           Klang, wenn ein Boss gefällt ist
+  boss.mp3 / .ogg / .wav             Klang bei der Ankündigung eines Gegners
+
+Grafiken, Schriften und Klänge aus dem Spiel gehören FromSoftware und Bandai Namco.
+Nutze nur Dateien, die du verwenden darfst.

@@ -23,7 +23,6 @@ function urlRow(label, path) {
 function mount(root) {
   controls = [];
   refs = {};
-  root.classList.add("wide");
   const iframe = h("iframe", { src: "/overlay/?muted=1&bg=light", title: "Overlay-Vorschau", tabIndex: -1 });
   refs.preview = h("div.preview", iframe);
   refs.logoToggle = h("div");
@@ -56,7 +55,7 @@ function mount(root) {
           field("Größe", bind(slider({ min: 40, max: 250, step: 5, label: "Größe", format: (v) => `${v} %`, onChange: overlaySetting("scale") }), (s) => s.settings.overlay.scale)),
           field("Hintergrund", bind(slider({ min: 0, max: 100, step: 5, label: "Deckkraft des Hintergrunds", format: (v) => `${v} %`, onChange: overlaySetting("backdrop") }), (s) => s.settings.overlay.backdrop), "Dunkles Band hinter der Zahl"),
           field("Beschriftung", bind(textInput({ placeholder: "Tode", maxLength: 24, label: "Beschriftung", onCommit: overlaySetting("label") }), (s) => s.settings.overlay.label), "Leer lassen für den Standard der Sprache"),
-          field("Bild", bind(picker({ label: "Bild neben der Zahl", options: onOff, onChange: overlaySetting("show_icon") }), (s) => s.settings.overlay.show_icon), "assets/icon.png, sonst das Todesfäule-Icon aus dem Spiel"),
+          field("Emblem", bind(picker({ label: "Emblem neben der Zahl", options: onOff, onChange: overlaySetting("show_icon") }), (s) => s.settings.overlay.show_icon), "Eigenes Bild über assets/icon.png möglich"),
           refs.logoToggle),
         block("Zusätzliche Werte", null,
           field("Diese Session", bind(picker({ label: "Diese Session", options: onOff, onChange: overlaySetting("show_session") }), (s) => s.settings.overlay.show_session)),

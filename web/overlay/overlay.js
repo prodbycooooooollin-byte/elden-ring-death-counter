@@ -9,8 +9,8 @@ const muted = params.get("muted") === "1";
 const bg = params.get("bg");
 if (bg === "dark" || bg === "light") document.body.classList.add(`bg-${bg}`);
 
-// Status icon "Death Blight" from the game's HUD (see assets/QUELLEN.md).
-const GAME_ICON = "/game/death-blight.png";
+// Emblem from the streamer's reference design, shipped with the app.
+const EMBLEM = "/shared/emblem.png";
 
 const stage = document.getElementById("stage");
 const counter = document.getElementById("counter");
@@ -73,7 +73,7 @@ function iconSrc(s) {
   const o = s.settings.overlay;
   if (o.show_logo && s.logo) return s.logo.url;
   if (!o.show_icon) return null;
-  return assets.icon || GAME_ICON;
+  return assets.icon || EMBLEM;
 }
 
 function template(s) {

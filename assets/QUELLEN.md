@@ -7,7 +7,7 @@ Die Nutzung erfolgt in eigener Verantwortung.
 
 | Datei in `assets/game` | Was es im Spiel ist | Verwendet in | Quelle (eldenring.wiki.gg) |
 |---|---|---|---|
-| `death-blight.png` (107 × 105 px) | Statussymbol „Death Blight“ (Todesfäule), erscheint im HUD bei Aufbau des Effekts | Overlay neben der Todeszahl, Statusleiste und Tab-Symbol im Pult | [File:Death_Blight.png](https://eldenring.wiki.gg/wiki/File:Death_Blight.png) |
+| `death-blight.png` (107 × 105 px) | Statussymbol „Death Blight“ (Todesfäule), erscheint im HUD bei Aufbau des Effekts | Statusleiste und Tab-Symbol im Pult | [File:Death_Blight.png](https://eldenring.wiki.gg/wiki/File:Death_Blight.png) |
 | `sacrificial-twig.png` (1024 × 1024 px) | Item-Bild des Talismans „Sacrificial Twig“ (Opferzweig) | Pult: Start- und Fehlerzustände | [File:ER_Icon_Talisman_Sacrificial_Twig.png](https://eldenring.wiki.gg/wiki/File:ER_Icon_Talisman_Sacrificial_Twig.png) |
 
 Die Wiki-Dateien stammen nach Angabe des Wikis aus den Spieldaten. Die Textinhalte des Wikis stehen unter CC BY-SA 4.0.
@@ -21,3 +21,8 @@ Als visuelle Referenz für die Gestaltung diente der In-Game-Screenshot
 
 Schrift: [EB Garamond](https://fonts.google.com/specimen/EB+Garamond) (SIL Open Font License), wird von Google Fonts geladen.
 Die Schrift des Spiels ist nicht frei verfügbar. Eigene Schriften und Klänge lassen sich über `assets/LIESMICH.txt` einbinden.
+
+## Emblem
+
+`web/shared/emblem.png` ist aus der Referenzgestaltung des Streamers ausgeschnitten und wurde von ihm zur Veröffentlichung
+freigegeben. Das Overlay nutzt es standardmäßig. Eine eigene Datei `assets/icon.png` hat Vorrang.

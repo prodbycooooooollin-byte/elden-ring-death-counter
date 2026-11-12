@@ -11,25 +11,15 @@ import { pickBoss } from "./views/pick-boss.js";
 const views = [overview, obs, bosses, save, settings];
 const menu = document.getElementById("menu");
 const content = document.getElementById("content");
+const keys = document.getElementById("keys");
 const el = (id) => document.getElementById(id);
 
 let active = null;
 let connected = false;
 let lastTotal = null;
 
-// SF-Symbols-like line icons, drawn for this app.
-const ICONS = {
-  overview: '<path d="M4 12h3l2-6 4 12 2-6h5" />',
-  obs: '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/>',
-  bosses: '<path d="M5 19 19 5M14 5h5v5M9 19H5v-4"/>',
-  save: '<path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/>',
-  settings: '<circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/>',
-};
-
 for (const [i, view] of views.entries()) {
-  menu.append(h("a.nav-item", { href: `#${view.id}`, dataset: { view: view.id }, title: `${view.title} (${i + 1})` },
-    h(`span.nav-icon.i-${view.id}`, { html: `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[view.id]}</svg>` }),
-    h("span", view.title)));
+  menu.append(h("a.menu-item", { href: `#${view.id}`, dataset: { view: view.id } }, view.title, h("span.menu-key", String(i + 1))));
 }
 
 function show(id) {
@@ -54,7 +44,7 @@ window.addEventListener("hashchange", () => show(location.hash.slice(1)));
 // ---------------------------------------------------------------- status strip
 
 const FEED = {
-  watching: ["live", "Live"],
+  watching: ["live", "Liest Spielstand"],
   searching: ["warn", "Sucht Spielstand"],
   manual: ["warn", "Manuelle Zählung"],
   error: ["bad", "Lesefehler"],
@@ -70,10 +60,10 @@ function renderStrip(state) {
   const character = s.character;
   if (character) {
     el("who-name").textContent = character.name;
-    el("who-meta").textContent = `Stufe ${character.level}, Slot ${character.slot}`;
+    el("who-meta").textContent = `Stufe ${character.level}, Slot ${character.slot}${s.slot_pinned ? ", fest gewählt" : ", automatisch erkannt"}`;
   } else {
     el("who-name").textContent = "Kein Charakter";
-    el("who-meta").textContent = s.status === "error" ? "Spielstand nicht lesbar" : "Zählung von Hand";
+    el("who-meta").textContent = s.status === "error" ? "Spielstand nicht lesbar" : "Tode werden von Hand gezählt";
   }
   const total = state.counts.total;
   el("fig-total").textContent = total;
@@ -90,17 +80,17 @@ function renderStrip(state) {
 function renderFeed(state) {
   const feed = el("feed");
   if (!connected) {
-    feed.className = "now-feed bad";
+    feed.className = "feed bad";
     el("feed-text").textContent = "Server nicht erreichbar";
     el("feed-detail").textContent = "Läuft das Fenster des Counters noch?";
     return;
   }
   const s = state ? state.save : { status: "idle" };
   const [cls, text] = FEED[s.status] || FEED.idle;
-  feed.className = `now-feed ${cls}`;
+  feed.className = `feed ${cls}`;
   el("feed-text").textContent = text;
   let detail = "";
-  if (s.status === "watching") detail = s.updated ? `Spielstand gelesen um ${time(s.updated)}` : "";
+  if (s.status === "watching") detail = s.updated ? `Zuletzt gelesen um ${time(s.updated)}` : "";
   else if (s.status === "error") detail = s.message;
   else if (s.status === "searching") detail = "Bis dahin zählst du von Hand";
   else if (s.status === "manual") detail = "Kein Spielstand verbunden";
@@ -136,6 +126,10 @@ async function felled() {
   await run(action("boss_felled"));
 }
 
+keys.replaceChildren(
+  ...shortcuts.map((s) => h("span", ...s.keys.map((k) => h("kbd", k)), s.label)),
+  h("span", h("kbd", "1–5"), "Bereich"),
+);
 
 document.addEventListener("keydown", (event) => {
   if (isDialogOpen() || event.ctrlKey || event.metaKey || event.altKey) return;

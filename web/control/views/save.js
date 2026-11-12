@@ -15,7 +15,7 @@ function mount(root) {
   refs = {};
   refs.notice = h("div.notice");
   refs.mode = h("div");
-  refs.path = h("input", { type: "text", placeholder: "…\\AppData\\Roaming\\EldenRing\\<Steam-ID>\\ER0000.sl2", "aria-label": "Pfad zum Spielstand" });
+  refs.path = h("input", { type: "text", autocomplete: "off", spellcheck: "false", name: "save-path", placeholder: "…\\AppData\\Roaming\\EldenRing\\<Steam-ID>\\ER0000.sl2", "aria-label": "Pfad zum Spielstand" });
   refs.found = h("ul.found");
   refs.slots = h("ul.slots");
   refs.slotMode = h("span");

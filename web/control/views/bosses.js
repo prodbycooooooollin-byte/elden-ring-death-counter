@@ -11,8 +11,8 @@ function mount(root) {
   refs.list = h("ul.boss-list");
   refs.summary = h("span.eyebrow");
 
-  const name = h("input", { type: "text", placeholder: "Name des Gegners", maxLength: 80, "aria-label": "Name des Gegners" });
-  const region = h("input", { type: "text", placeholder: "Gebiet (optional)", maxLength: 60, "aria-label": "Gebiet" });
+  const name = h("input", { type: "text", placeholder: "Name des Gegners …", autocomplete: "off", name: "boss-name", maxLength: 80, "aria-label": "Name des Gegners" });
+  const region = h("input", { type: "text", placeholder: "Gebiet (optional) …", autocomplete: "off", name: "boss-region", maxLength: 60, "aria-label": "Gebiet" });
   const great = h("input", { type: "checkbox" });
   const add = async (event) => {
     event.preventDefault();
@@ -25,7 +25,7 @@ function mount(root) {
     }
   };
 
-  const search = h("input", { type: "search", placeholder: "Suchen", value: query, "aria-label": "Gegner suchen" });
+  const search = h("input", { type: "search", placeholder: "Suchen …", autocomplete: "off", name: "boss-filter", value: query, "aria-label": "Gegner suchen" });
   search.addEventListener("input", () => { query = search.value.trim().toLowerCase(); render(getState()); });
 
   root.append(
@@ -34,7 +34,7 @@ function mount(root) {
       search,
       picker({ label: "Filter", options: [["all", "Alle Gegner"], ["open", "Noch offen"], ["felled", "Gefällt"]], value: filter, onChange: (v) => { filter = v; render(getState()); } }),
       refs.summary),
-    refs.list,
+    h("div.group", refs.list),
     block("Gegner hinzufügen", null,
       h("p.hint", "Großer Feind steht für Erinnerungsbosse. Das Overlay zeigt bei ihnen GROSSER FEIND GEFÄLLT."),
       h("form.addform", { onsubmit: add },

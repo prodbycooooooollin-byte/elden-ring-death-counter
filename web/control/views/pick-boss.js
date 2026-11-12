@@ -6,7 +6,7 @@ export function pickBoss() {
   const state = getState();
   if (!state) return Promise.resolve();
   return modal((close) => {
-    const search = h("input", { type: "search", placeholder: "Gegner suchen oder neu anlegen", "aria-label": "Gegner suchen", autofocus: true });
+    const search = h("input", { type: "search", placeholder: "Gegner suchen oder neu anlegen …", autocomplete: "off", name: "boss-search", "aria-label": "Gegner suchen", autofocus: true });
     const list = h("ul.picklist", { role: "listbox" });
     let items = [];
     let hl = 0;

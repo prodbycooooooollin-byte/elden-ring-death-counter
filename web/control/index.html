@@ -3,34 +3,40 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#141416">
   <title>Death Counter</title>
-  <link rel="icon" href="/game/death-blight.png" type="image/png">
+  <link rel="icon" href="/assets/icon.png" type="image/png">
   <link rel="stylesheet" href="/shared/tokens.css">
   <link rel="stylesheet" href="control.css">
 </head>
 <body>
-  <header class="status-strip" aria-label="Aktueller Stand">
-    <div class="who">
-      <span class="cap">Gezählt wird</span>
-      <span class="who-name" id="who-name">…</span>
-      <span class="who-meta" id="who-meta"></span>
+  <a class="skip" href="#content">Zum Inhalt springen</a>
+  <aside class="sidebar">
+    <div class="app-title">
+      <img class="app-mark" src="/assets/icon.png" alt="" width="26" height="26" onerror="this.src='/game/death-blight.png'">
+      <span>Death Counter</span>
     </div>
-    <div class="figure">
-      <img src="/game/death-blight.png" alt="" onerror="this.remove()">
-      <div><span class="cap">Gesamt</span><div class="figure-num num" id="fig-total">0</div></div>
-    </div>
-    <div class="figure">
-      <div><span class="cap">Diese Session</span><div class="figure-num small num" id="fig-session">0</div></div>
-    </div>
-    <div class="feed" id="feed">
-      <span class="feed-state"><i></i><span id="feed-text">Verbinde …</span></span>
-      <span class="feed-detail" id="feed-detail"></span>
-    </div>
-  </header>
+    <nav class="nav" id="menu" aria-label="Bereiche"></nav>
 
-  <nav class="menu" id="menu" aria-label="Bereiche"></nav>
-  <main class="content" id="content"></main>
-  <footer class="keys" id="keys" aria-label="Tastenkürzel"></footer>
+    <section class="now" aria-label="Aktueller Stand">
+      <div class="now-feed" id="feed">
+        <span class="dot" aria-hidden="true"></span>
+        <span id="feed-text">Verbinde …</span>
+      </div>
+      <div class="now-who">
+        <span class="now-name" id="who-name">…</span>
+        <span class="now-meta" id="who-meta"></span>
+      </div>
+      <div class="now-figures">
+        <div><span class="now-num num" id="fig-total">0</span><span class="now-cap">Gesamt</span></div>
+        <div><span class="now-num num" id="fig-session">0</span><span class="now-cap">Session</span></div>
+      </div>
+      <div class="now-detail" id="feed-detail"></div>
+    </section>
+  </aside>
+
+  <main class="content" id="content" tabindex="-1"></main>
   <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
   <script type="module" src="main.js"></script>
 </body>

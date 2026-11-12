@@ -23,6 +23,7 @@ function urlRow(label, path) {
 function mount(root) {
   controls = [];
   refs = {};
+  root.classList.add("wide");
   const iframe = h("iframe", { src: "/overlay/?muted=1&bg=light", title: "Overlay-Vorschau", tabIndex: -1 });
   refs.preview = h("div.preview", iframe);
   refs.logoToggle = h("div");

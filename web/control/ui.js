@@ -33,13 +33,14 @@ function append(el, children) {
   }
 }
 
-/** A titled group of rows, like a section of the game's settings menu. */
+/** Inset grouped list, as in macOS System Settings: a small header and a rounded group. */
 export function block(title, aside, ...children) {
   return h("section.block",
-    h("div.block-title", h("h2", title), aside ? h("span", aside) : null),
-    ...children);
+    title || aside ? h("div.block-title", title ? h("h2", title) : h("span"), aside ? h("div.block-aside", aside) : null) : null,
+    h("div.group", ...children));
 }
 
+/** Large title with an optional one-line explanation. */
 export function viewHead(title, text) {
   return h("header.view-head", h("h1", title), text ? h("p", text) : null);
 }
@@ -47,7 +48,7 @@ export function viewHead(title, text) {
 /** Game item art with a caption, used for empty and start states. */
 export function itemView(title, text) {
   return h("div.itemview",
-    h("img", { src: "/game/sacrificial-twig.png", alt: "Opferzweig, Talisman aus Elden Ring", onerror: (e) => e.target.remove() }),
+    h("img", { src: "/game/sacrificial-twig.png", alt: "Opferzweig, Talisman aus Elden Ring", width: 72, height: 72, onerror: (e) => e.target.remove() }),
     h("div", h("h3", title), h("p", text)));
 }
 
@@ -125,40 +126,64 @@ export function confirmDialog(text, yes = "Ja", no = "Abbrechen") {
 
 // ---------------------------------------------------------------- inputs
 
-const arrow = (dir) => `<svg viewBox="0 0 10 12" aria-hidden="true"><path d="${dir < 0 ? "M9 1L2 6L9 11" : "M1 1L8 6L1 11"}" fill="currentColor"/></svg>`;
-
-/** The game's ◂ value ▸ option picker. options: [[value, label], ...] */
+/**
+ * Option control. Two boolean options render as a switch, up to four options as a
+ * segmented control, more as a menu (native select). Every variant exposes .set(value).
+ */
 export function picker({ options, value, onChange, label }) {
-  let index = Math.max(0, options.findIndex(([v]) => v === value));
-  const out = h("output");
-  const el = h("div.picker", { role: "group", "aria-label": label || "" });
-  const show = () => {
-    out.textContent = options[index][1];
-    el.classList.toggle("on", options[index][0] === true);
-    el.classList.toggle("off", options[index][0] === false);
-  };
-  const step = (delta) => {
-    index = (index + delta + options.length) % options.length;
-    show();
-    onChange(options[index][0]);
-  };
-  const prev = h("button", { type: "button", html: arrow(-1), "aria-label": "Vorherige Option", onclick: () => step(-1) });
-  const next = h("button", { type: "button", html: arrow(1), "aria-label": "Nächste Option", onclick: () => step(1) });
-  out.addEventListener("click", () => step(1));
-  el.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowLeft") { event.preventDefault(); step(-1); }
-    if (event.key === "ArrowRight") { event.preventDefault(); step(1); }
+  const isBool = options.length === 2 && options.every(([v]) => typeof v === "boolean");
+  if (isBool) return toggle({ value: value === undefined ? true : value, onChange, label });
+  const length = options.reduce((n, [, text]) => n + text.length, 0);
+  if (options.length <= 3 && length <= 36) return segmented({ options, value, onChange, label });
+  return menu({ options, value, onChange, label });
+}
+
+export function toggle({ value, onChange, label }) {
+  const input = h("input.switch", { type: "checkbox", role: "switch", "aria-label": label || "" });
+  input.checked = Boolean(value);
+  input.addEventListener("change", () => onChange(input.checked));
+  input.set = (v) => { input.checked = Boolean(v); };
+  return input;
+}
+
+export function segmented({ options, value, onChange, label }) {
+  const el = h("div.segmented", { role: "radiogroup", "aria-label": label || "" });
+  const buttons = options.map(([v, text]) => {
+    const b = h("button", { type: "button", role: "radio" }, text);
+    b.addEventListener("click", () => {
+      el.set(v);
+      onChange(v);
+    });
+    b.dataset.value = JSON.stringify(v);
+    return b;
   });
-  el.append(prev, out, next);
+  el.append(...buttons);
+  el.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+    event.preventDefault();
+    const i = buttons.findIndex((b) => b.getAttribute("aria-checked") === "true");
+    const next = buttons[(i + (event.key === "ArrowRight" ? 1 : -1) + buttons.length) % buttons.length];
+    next.click();
+    next.focus();
+  });
   el.set = (v) => {
-    const i = options.findIndex(([o]) => o === v);
-    if (i >= 0 && i !== index) {
-      index = i;
-      show();
+    for (const b of buttons) {
+      const on = b.dataset.value === JSON.stringify(v);
+      b.setAttribute("aria-checked", String(on));
+      b.tabIndex = on ? 0 : -1;
     }
   };
-  show();
+  el.set(value === undefined ? options[0][0] : value);
   return el;
+}
+
+export function menu({ options, value, onChange, label }) {
+  const select = h("select.menu-select", { "aria-label": label || "" },
+    ...options.map(([v, text]) => h("option", { value: JSON.stringify(v) }, text)));
+  select.addEventListener("change", () => onChange(JSON.parse(select.value)));
+  select.set = (v) => { select.value = JSON.stringify(v); };
+  if (value !== undefined) select.set(value);
+  return select;
 }
 
 export const onOff = [[true, "Ein"], [false, "Aus"]];
@@ -185,7 +210,7 @@ export function slider({ min, max, step = 1, value, format = (v) => v, onChange,
 
 /** Text input that commits on Enter or blur. */
 export function textInput({ value = "", placeholder = "", onCommit, maxLength = 120, label }) {
-  const input = h("input", { type: "text", value, placeholder, maxLength, "aria-label": label || placeholder });
+  const input = h("input", { type: "text", value, placeholder, maxLength, autocomplete: "off", spellcheck: "false", name: (label || placeholder).toLowerCase().replace(/\W+/g, "-"), "aria-label": label || placeholder });
   let committed = value;
   const commit = () => {
     if (input.value !== committed) {
@@ -206,8 +231,9 @@ export function textInput({ value = "", placeholder = "", onCommit, maxLength = 
   return input;
 }
 
+/** One row of a group: label (and hint) on the left, the control trailing. */
 export function field(label, control, hint) {
-  return h("div.field", h("div.label", label, hint ? h("small", hint) : null), control);
+  return h("div.field", h("div.label", h("span", label), hint ? h("small", hint) : null), h("div.control", control));
 }
 
 // ---------------------------------------------------------------- formatting
